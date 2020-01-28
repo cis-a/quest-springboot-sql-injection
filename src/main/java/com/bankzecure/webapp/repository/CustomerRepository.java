@@ -94,7 +94,6 @@ public class CustomerRepository {
         String query = queryBuilder.toString();
         statement.executeUpdate(query);
 */
-
         JdbcUtils.closeStatement(statement);
         JdbcUtils.closeConnection(connection);
 
@@ -102,6 +101,7 @@ public class CustomerRepository {
         statement = connection.prepareStatement("SELECT * FROM customer WHERE identifier = ?;",
         Statement.RETURN_GENERATED_KEYS
         );
+        statement.setString(1, identifier);
         resultSet = statement.executeQuery();
 /* OLD
         query = "SELECT * FROM customer WHERE identifier = '" + identifier + "'";
