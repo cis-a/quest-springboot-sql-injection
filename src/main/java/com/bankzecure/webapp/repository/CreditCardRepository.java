@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ArrayList;
 import com.bankzecure.webapp.entity.*;
 import com.bankzecure.webapp.JdbcUtils;
+import java.sql.PreparedStatement;
 
 public class CreditCardRepository {
   private final static String DB_URL = "jdbc:mysql://localhost:3306/springboot_bankzecure?serverTimezone=GMT";
@@ -17,15 +18,20 @@ public class CreditCardRepository {
 
   public List<CreditCard> findByCustomerIdentifier(final String identifier) {
     Connection connection = null;
-    Statement statement = null;
+    PreparedStatement statement = null;
     ResultSet resultSet = null;
-    final String query = "SELECT cc.* FROM credit_card cc " +
+    /*OLD: final String query = "SELECT cc.* FROM credit_card cc " +
       "JOIN customer c ON cc.customer_id = c.id " +
-      "WHERE c.identifier = '" + identifier + "'";
+      "WHERE c.identifier = '" + identifier + "'";*/
     try {
       connection = DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-      statement = connection.createStatement();
-      resultSet = statement.executeQuery(query);
+      statement = connection.prepareStatement( "SELECT cc.* FROM credit_card cc JOIN customer c ON cc.customer_id = c.id WHERE c.identifier = ?;",
+                      Statement.RETURN_GENERATED_KEYS
+                      );
+      				statement.setString(1, identifier);
+
+      //OLD: statement = connection.createStatement();
+      resultSet = statement.executeQuery();
 
       final List<CreditCard> creditCards = new ArrayList<CreditCard>();
 
